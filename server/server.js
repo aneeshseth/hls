@@ -1,11 +1,18 @@
-const express = require('express');
-const app = express();
-const port = 3000;
-const multer = require('multer');
-const ffmpeg = require('fluent-ffmpeg');
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
+import express from 'express';
+import multer from 'multer';
+import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs';
+import path from 'path';
+import cors from 'cors';
+const app = express()
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const port = 3004;
+import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
+import {path as ffprobePath} from '@ffprobe-installer/ffprobe'
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
+
 
 // Middlewares
 app.use(cors());
@@ -27,16 +34,15 @@ const upload = multer({ storage: storage });
 
 // Routes
 app.post('/upload', upload.single('video'), async (req, res) => {
-
   try {
     console.log(req.file);
+    const __dirname = dirname(fileURLToPath(import.meta.url));
     const inputFilePath = req.file.path;
     const outputDir = path.join(__dirname, 'public', 'hls');
     const outputFileName = `${Date.now()}.m3u8`;
-
     await ffmpeg(inputFilePath)
       .outputOptions([
-        '-hls_time 10',
+        '-hls_time 2',
         '-hls_list_size 0'
       ])
       .output(`${outputDir}/${outputFileName}`)
@@ -54,6 +60,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 })
 
 app.get('/stream/:manifest', (req, res) => {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
   const manifestFileName = req.params.manifest;
   const manifestPath = path.join(__dirname, 'public', 'hls', manifestFileName);
 

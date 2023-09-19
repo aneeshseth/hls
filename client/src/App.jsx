@@ -16,12 +16,13 @@ export default function App() {
     const formData = new FormData();
     formData.append('video', video);
 
-    const res = await fetch('http://localhost:3000/upload', {
+    const res = await fetch('http://localhost:3004/upload', {
       method: 'POST',
       body: formData
     })
 
     const data = await res.json();
+    console.log(data.manifest)
     return data.manifest;
   }
 
@@ -33,7 +34,8 @@ export default function App() {
   const handelSubmit = async (e) => {
     e.preventDefault();
     const manifest = await fetchManifest();
-    serManifestUrl(`http://localhost:3000/stream/${manifest}`)
+    console.log(manifest)
+    serManifestUrl(`http://localhost:3004/stream/${manifest}`)
   }
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function App() {
 
   return (
     <div>
-      <form action="http://localhost:3000/upload" method="post" encType="multipart/form-data" onSubmit={handelSubmit}>
+      <form action="http://localhost:3004/upload" method="post" encType="multipart/form-data" onSubmit={handelSubmit}>
         <input type="file" name="video" accept="video/mp4" onChange={handleVideoChange} />
         <button type="submit">Upload</button>
       </form>
